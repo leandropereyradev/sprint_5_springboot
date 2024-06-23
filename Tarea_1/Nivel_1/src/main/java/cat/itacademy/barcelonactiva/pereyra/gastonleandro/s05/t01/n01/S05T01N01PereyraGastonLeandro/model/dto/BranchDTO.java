@@ -14,7 +14,7 @@ public class BranchDTO {
     private String branchCountry;
     private String branchType;
 
-    private static final List<String> euCountries = Arrays.asList(
+    private static final List<String> EU_COUNTRIES = Arrays.asList(
             "austria", "belgium", "bulgaria", "croatia", "cyprus",
             "czech republic", "denmark", "estonia", "finland",
             "france", "germany", "greece", "hungary", "ireland",
@@ -23,6 +23,9 @@ public class BranchDTO {
             "slovakia", "slovenia", "spain", "sweden"
     );
 
+    public BranchDTO() {
+    }
+
     public BranchDTO(Integer pk_BranchID, String branchName, String branchCountry) {
         String name = branchName.toLowerCase().trim();
         String country = branchCountry.toLowerCase().trim();
@@ -30,7 +33,7 @@ public class BranchDTO {
         this.pk_BranchID = pk_BranchID;
         this.branchName = name;
         this.branchCountry = country;
-        this.branchType = euCountries.contains(country) ? "EU" : "Non-EU";
+        this.branchType = EU_COUNTRIES.contains(country) ? "EU" : "Non-EU";
     }
 
 }

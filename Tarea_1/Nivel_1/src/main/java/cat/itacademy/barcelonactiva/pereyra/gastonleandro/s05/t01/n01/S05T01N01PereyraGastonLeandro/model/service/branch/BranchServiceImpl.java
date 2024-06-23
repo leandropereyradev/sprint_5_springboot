@@ -1,9 +1,9 @@
-package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t01.n01.S05T01N01PereyraGastonLeandro.model.service;
+package cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t01.n01.S05T01N01PereyraGastonLeandro.model.service.branch;
 
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t01.n01.S05T01N01PereyraGastonLeandro.exception.BranchServiceException;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t01.n01.S05T01N01PereyraGastonLeandro.model.domain.Branch;
 import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t01.n01.S05T01N01PereyraGastonLeandro.model.dto.BranchDTO;
-import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t01.n01.S05T01N01PereyraGastonLeandro.model.repository.BranchRepository;
+import cat.itacademy.barcelonactiva.pereyra.gastonleandro.s05.t01.n01.S05T01N01PereyraGastonLeandro.model.repository.IBranchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,35 +12,29 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class BranchService {
+public class BranchServiceImpl implements IBranchService {
 
     @Autowired
-    private BranchRepository branchRepository;
+    private IBranchRepository branchRepository;
 
-    public List<BranchDTO> addBranches(List<BranchDTO> branchDTOs) {
+    @Override
+    public void addBranch(BranchDTO branchDTO) {
         try {
-            List<Branch> branches = branchDTOs.stream().map(dto -> {
-                Branch branch = new Branch();
-                branch.setBranchName(dto.getBranchName());
-                branch.setBranchCountry(dto.getBranchCountry());
-                return branch;
-            }).collect(Collectors.toList());
+            Branch branch = new Branch();
+            branch.setBranchName(branchDTO.getBranchName());
+            branch.setBranchCountry(branchDTO.getBranchCountry());
 
-            List<Branch> savedBranches = branchRepository.saveAll(branches);
+            branchRepository.save(branch);
 
-            return savedBranches.stream().map(branch -> new BranchDTO(
-                    branch.getPk_BranchID(),
-                    branch.getBranchName(),
-                    branch.getBranchCountry()
-            )).collect(Collectors.toList());
         } catch (Exception e) {
-            throw new BranchServiceException("Failed to add branches", e);
+            throw new BranchServiceException("Failed to add branch", e);
         }
     }
 
-    public BranchDTO updateBranch(Integer id, BranchDTO branchDTO) {
+    @Override
+    public void updateBranch(BranchDTO branchDTO) {
         try {
-            Optional<Branch> existingBranch = branchRepository.findById(id);
+            Optional<Branch> existingBranch = branchRepository.findById(branchDTO.getPk_BranchID());
 
             if (existingBranch.isEmpty()) {
                 throw new BranchServiceException("Branch not found");
@@ -49,31 +43,29 @@ public class BranchService {
             Branch branch = existingBranch.get();
             branch.setBranchName(branchDTO.getBranchName());
             branch.setBranchCountry(branchDTO.getBranchCountry());
-            Branch updatedBranch = branchRepository.save(branch);
 
-            return new BranchDTO(
-                    updatedBranch.getPk_BranchID(),
-                    updatedBranch.getBranchName(),
-                    updatedBranch.getBranchCountry()
-            );
+            branchRepository.save(branch);
+
         } catch (Exception e) {
             throw new BranchServiceException("Failed to update branch", e);
         }
     }
 
-    public boolean deleteBranch(Integer id) {
+    @Override
+    public void deleteBranch(Integer id) {
         try {
             if (!branchRepository.existsById(id)) {
                 throw new BranchServiceException("Branch not found");
             }
 
             branchRepository.deleteById(id);
-            return true;
+
         } catch (Exception e) {
             throw new BranchServiceException("Failed to delete branch", e);
         }
     }
 
+    @Override
     public BranchDTO getBranchById(Integer id) {
         try {
             Optional<Branch> branch = branchRepository.findById(id);
@@ -88,6 +80,7 @@ public class BranchService {
         }
     }
 
+    @Override
     public List<BranchDTO> getAllBranches() {
         try {
             return branchRepository.findAll().stream()
