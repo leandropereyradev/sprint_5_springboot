@@ -26,7 +26,7 @@ public class BranchServiceImpl implements IBranchService {
 
             branchRepository.save(branch);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new BranchServiceException("Failed to add branch", e);
         }
     }
@@ -36,9 +36,7 @@ public class BranchServiceImpl implements IBranchService {
         try {
             Optional<Branch> existingBranch = branchRepository.findById(branchDTO.getPk_BranchID());
 
-            if (existingBranch.isEmpty()) {
-                throw new BranchServiceException("Branch not found");
-            }
+            if (existingBranch.isEmpty()) throw new BranchServiceException("Branch not found");
 
             Branch branch = existingBranch.get();
             branch.setBranchName(branchDTO.getBranchName());
@@ -46,7 +44,7 @@ public class BranchServiceImpl implements IBranchService {
 
             branchRepository.save(branch);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new BranchServiceException("Failed to update branch", e);
         }
     }
@@ -54,13 +52,11 @@ public class BranchServiceImpl implements IBranchService {
     @Override
     public void deleteBranch(Integer id) {
         try {
-            if (!branchRepository.existsById(id)) {
-                throw new BranchServiceException("Branch not found");
-            }
+            if (!branchRepository.existsById(id)) throw new BranchServiceException("Branch not found");
 
             branchRepository.deleteById(id);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new BranchServiceException("Failed to delete branch", e);
         }
     }
@@ -75,7 +71,8 @@ public class BranchServiceImpl implements IBranchService {
                     value.getBranchName(),
                     value.getBranchCountry()
             )).orElse(null);
-        } catch (Exception e) {
+
+        } catch (RuntimeException e) {
             throw new BranchServiceException("Failed to get branch by ID", e);
         }
     }
@@ -90,7 +87,8 @@ public class BranchServiceImpl implements IBranchService {
                             branch.getBranchCountry()
                     ))
                     .collect(Collectors.toList());
-        } catch (Exception e) {
+
+        } catch (RuntimeException e) {
             throw new BranchServiceException("Failed to get all branches", e);
         }
     }
